@@ -1,105 +1,200 @@
 
+/* =====================================
+   BLISS CHOCOLATE - ADMIN PANEL
+   Premium Chocolate Brown Theme
+===================================== */
+
+:root {
+  --brown: #5b3027;
+  --brown-dark: #3d211c;
+  --brown-light: #75483c;
+  --cream: #f8f3ed;
+  --cream-dark: #eee5db;
+  --white: #ffffff;
+  --text: #38251f;
+  --muted: #8b7770;
+  --border: #e8ddd4;
+  --shadow: 0 8px 30px rgba(65, 36, 28, 0.08);
+  --radius: 14px;
+}
+
+/* RESET */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  background: #f7f4f1;
-  color: #38241e;
-  font-family: Arial, sans-serif;
+html {
+  scroll-behavior: smooth;
 }
 
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* LOGIN SCREEN */
+
 .login-box {
-  width: min(400px, 92%);
+  width: min(420px, 92%);
   margin: 100px auto;
-  background: white;
-  padding: 35px;
-  border-radius: 14px;
-  box-shadow: 0 8px 35px #0000000d;
+  padding: 40px 35px;
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .login-box h1 {
-  color: #713b32;
-  margin-bottom: 12px;
-}
-
-.login-box p {
-  color: #806e65;
-  margin-bottom: 20px;
-}
-
-.admin-header {
-  background: #713b32;
-  color: white;
-  padding: 22px 6%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.admin-content {
-  max-width: 850px;
-  margin: 45px auto;
-  padding: 35px;
-  background: white;
-  border-radius: 14px;
-}
-
-.admin-content h1 {
+  color: var(--brown);
+  font-size: 29px;
   margin-bottom: 10px;
 }
 
-.admin-content > p {
-  color: #8b7a71;
-  margin-bottom: 30px;
+.login-box p {
+  color: var(--muted);
+  margin-bottom: 25px;
 }
+
+/* HEADER */
+
+.admin-header {
+  background: linear-gradient(
+    120deg,
+    var(--brown-dark),
+    var(--brown)
+  );
+  color: var(--white);
+  padding: 23px 6%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 4px 18px rgba(40, 20, 15, 0.15);
+}
+
+.admin-header h1 {
+  font-size: 25px;
+  letter-spacing: 0.3px;
+}
+
+.admin-header p {
+  color: #eadbd3;
+  font-size: 13px;
+}
+
+/* MAIN CONTENT */
+
+.admin-content {
+  max-width: 1000px;
+  width: 92%;
+  margin: 40px auto;
+  padding: 35px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.admin-content h1 {
+  color: var(--brown);
+  font-size: 27px;
+  margin-bottom: 8px;
+}
+
+.admin-content h2 {
+  color: var(--brown);
+  margin-bottom: 15px;
+}
+
+.admin-content > p {
+  color: var(--muted);
+  margin-bottom: 25px;
+}
+
+/* FORM LABELS */
 
 form label {
   display: block;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--brown-dark);
   margin: 20px 0 8px;
 }
 
-input, textarea, select {
+/* INPUTS */
+
+input,
+textarea,
+select {
   width: 100%;
-  padding: 13px;
-  border: 1px solid #dfd5cf;
-  border-radius: 7px;
+  padding: 14px 15px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
   font: inherit;
-  background: white;
+  color: var(--text);
+  background: #fffdfb;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--brown-light);
+  box-shadow: 0 0 0 3px rgba(91, 48, 39, 0.09);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #ad9d95;
 }
 
 textarea {
   resize: vertical;
-  line-height: 1.6;
+  min-height: 120px;
+  line-height: 1.7;
 }
+
+/* BUTTONS */
 
 button {
   padding: 13px 22px;
   border: none;
-  border-radius: 7px;
-  background: #713b32;
-  color: white;
-  font-weight: bold;
+  border-radius: 9px;
+  background: var(--brown);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
+  transition: 0.2s ease;
 }
 
 button:hover {
-  background: #512820;
+  background: var(--brown-dark);
+  transform: translateY(-1px);
 }
 
 button:disabled {
-  opacity: .6;
+  opacity: 0.6;
   cursor: wait;
+  transform: none;
 }
 
 .secondary {
-  background: #eee5df;
-  color: #49352d;
+  background: var(--cream-dark);
+  color: var(--brown);
 }
+
+.secondary:hover {
+  background: #e3d4c7;
+}
+
+/* ACTION BUTTONS */
 
 .actions {
   display: flex;
@@ -108,66 +203,222 @@ button:disabled {
   margin-top: 25px;
 }
 
-#status-message, #login-message {
-  margin-top: 18px;
-  line-height: 1.6;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-@media(max-width: 600px) {
-  .admin-content {
-    margin: 20px 12px;
-    padding: 22px;
-  }
-
-  .admin-header {
-    padding: 18px;
-  }
-}
+/* RICH TEXT EDITOR */
 
 .editor-toolbar {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 10px;
+  padding: 12px;
+  background: #f6f0ea;
+  border: 1px solid var(--border);
+  border-radius: 10px 10px 0 0;
 }
 
 .editor-toolbar button {
   width: auto;
-  min-width: 55px;
-  padding: 12px 18px;
+  min-width: 42px;
+  padding: 9px 14px;
   margin: 0;
+  border-radius: 7px;
+  background: var(--white);
+  color: var(--brown);
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.editor-toolbar button:hover {
+  background: var(--brown);
+  color: var(--white);
 }
 
 .editor-toolbar select {
   width: auto;
-  min-width: 150px;
-  padding: 12px;
+  min-width: 140px;
+  padding: 9px 12px;
   margin: 0;
+  background: var(--white);
+  font-size: 13px;
 }
 
 .rich-editor {
   width: 100%;
   min-height: 350px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
   outline: none;
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 1.8;
   background: #fff;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
 .rich-editor:focus {
-  border-color: #754237;
+  border-color: var(--brown-light);
+  box-shadow: 0 0 0 3px rgba(91, 48, 39, 0.06);
 }
 
 .rich-editor:empty::before {
   content: attr(data-placeholder);
-  color: #999;
+  color: #ad9d95;
   pointer-events: none;
+}
+
+.rich-editor h2 {
+  color: var(--brown);
+  font-size: 25px;
+  margin: 18px 0 10px;
+}
+
+.rich-editor h3 {
+  color: var(--brown-light);
+  font-size: 20px;
+  margin: 15px 0 8px;
+}
+
+.rich-editor p {
+  margin-bottom: 12px;
+}
+
+.rich-editor ul,
+.rich-editor ol {
+  padding-left: 28px;
+  margin: 12px 0;
+}
+
+.rich-editor a {
+  color: #9b563d;
+  text-decoration: underline;
+}
+
+.rich-editor blockquote {
+  border-left: 4px solid var(--brown);
+  padding: 12px 18px;
+  margin: 15px 0;
+  background: var(--cream);
+}
+
+/* STATUS MESSAGES */
+
+#status-message,
+#login-message {
+  margin-top: 18px;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* BLOG LIST */
+
+#blogs-list {
+  margin-top: 20px;
+}
+
+#blogs-list button {
+  margin: 4px;
+}
+
+/* FILE INPUT */
+
+input[type="file"] {
+  padding: 10px;
+  background: var(--cream);
+  cursor: pointer;
+}
+
+/* HIDDEN ELEMENTS */
+
+[hidden] {
+  display: none !important;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b69a8c;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brown);
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 700px) {
+
+  .admin-header {
+    padding: 18px 5%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-header h1 {
+    font-size: 22px;
+  }
+
+  .admin-content {
+    width: 94%;
+    margin: 22px auto;
+    padding: 22px 17px;
+  }
+
+  .admin-content h1 {
+    font-size: 23px;
+  }
+
+  .login-box {
+    margin: 65px auto;
+    padding: 28px 22px;
+  }
+
+  .editor-toolbar {
+    gap: 6px;
+    padding: 9px;
+  }
+
+  .editor-toolbar button {
+    padding: 9px 11px;
+  }
+
+  .editor-toolbar select {
+    min-width: 115px;
+    max-width: 100%;
+  }
+
+  .rich-editor {
+    min-height: 300px;
+    padding: 14px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+
+  .editor-toolbar button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .editor-toolbar select {
+    width: 100%;
+  }
 }

@@ -1,35 +1,73 @@
 
-const WORKER_URL = "PASTE_YOUR_CLOUDFLARE_WORKER_URL_HERE";
+const WORKER_URL = "https://bliss-blog-api.blisschocolate01.workers.dev/";
 
 const loginScreen = document.getElementById("login-screen");
 const dashboard = document.getElementById("dashboard");
 const passwordInput = document.getElementById("password");
+const loginMessage = document.getElementById("login-message");
 
 let adminPassword = "";
 
-document.getElementById("login-btn").addEventListener("click", () => {
-  const password = passwordInput.value;
+async function apiRequest(payload) {
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify(payload)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || "Something went wrong.");
+  }
+
+  return result;
+}
+
+// Secure login: password is verified by Cloudflare Worker.
+document.getElementById("login-btn").addEventListener("click", async () => {
+  const password = passwordInput.value.trim();
 
   if (!password) {
-    document.getElementById("login-message").textContent =
-      "Please enter your password.";
+    loginMessage.textContent = "Please enter your password.";
     return;
   }
 
-  // Actual password verification happens on the Worker.
-  adminPassword = password;
-  loginScreen.hidden = true;
-  dashboard.hidden = false;
+  const loginButton = document.getElementById("login-btn");
+  loginButton.disabled = true;
+  loginMessage.textContent = "Verifying password...";
+
+  try {
+    await apiRequest({
+      action: "login",
+      password
+    });
+
+    adminPassword = password;
+    loginScreen.hidden = true;
+    dashboard.hidden = false;
+    loginMessage.textContent = "";
+
+  } catch (error) {
+    adminPassword = "";
+    loginMessage.textContent = "Login failed: " + error.message;
+
+  } finally {
+    loginButton.disabled = false;
+  }
 });
 
+// Logout
 document.getElementById("logout-btn").addEventListener("click", () => {
   adminPassword = "";
   dashboard.hidden = true;
   loginScreen.hidden = false;
   passwordInput.value = "";
   document.getElementById("blog-form").reset();
+  document.getElementById("status-message").textContent = "";
 });
 
+// Automatic URL slug
 const titleInput = document.getElementById("title");
 const slugInput = document.getElementById("slug");
 
@@ -41,6 +79,7 @@ titleInput.addEventListener("input", () => {
     .replace(/^-|-$/g, "");
 });
 
+// Blog data
 function getBlogData(status) {
   return {
     title: titleInput.value.trim(),
@@ -55,10 +94,12 @@ function getBlogData(status) {
   };
 }
 
+// Publish or save draft
 async function publishBlog(status) {
   const form = document.getElementById("blog-form");
   const message = document.getElementById("status-message");
   const publishButton = document.getElementById("publish-btn");
+  const draftButton = document.getElementById("draft-btn");
 
   if (!form.reportValidity()) return;
 
@@ -85,17 +126,20 @@ async function publishBlog(status) {
   }
 
   publishButton.disabled = true;
-  message.textContent = "Publishing... Please wait.";
+  draftButton.disabled = true;
+  message.textContent = status === "published"
+    ? "Publishing... Please wait."
+    : "Saving draft... Please wait.";
 
   try {
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
+      reader.onerror = () => reject(new Error("Could not read image."));
       reader.readAsDataURL(file);
     });
 
-    const payload = {
+    await apiRequest({
       password: adminPassword,
       action: "publish",
       blog: getBlogData(status),
@@ -104,38 +148,30 @@ async function publishBlog(status) {
         type: file.type,
         data: base64
       }
-    };
-
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify(payload)
     });
 
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || "Publishing failed");
-    }
-
     message.textContent = status === "published"
-      ? "Blog successfully sent to GitHub! Deployment will start automatically."
+      ? "Blog sent to GitHub! Website deployment will start automatically."
       : "Draft saved to GitHub!";
 
     form.reset();
 
   } catch (error) {
     message.textContent = "Error: " + error.message;
+
   } finally {
     publishButton.disabled = false;
+    draftButton.disabled = false;
   }
 }
 
+// Publish button
 document.getElementById("blog-form").addEventListener("submit", event => {
   event.preventDefault();
   publishBlog("published");
 });
 
+// Save draft button
 document.getElementById("draft-btn").addEventListener("click", () => {
   publishBlog("draft");
 });

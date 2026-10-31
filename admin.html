@@ -75,8 +75,26 @@
           required maxlength="250"></textarea>
 
         <label>Blog Content</label>
-        <textarea id="content" rows="14" required
-          placeholder="Write your article here. Leave a blank line between paragraphs."></textarea>
+      <div class="editor-toolbar">
+  <button type="button" data-command="bold"><b>B</b></button>
+  <button type="button" data-command="italic"><i>I</i></button>
+  <button type="button" data-command="underline"><u>U</u></button>
+
+  <select id="format-block">
+    <option value="p">Paragraph</option>
+    <option value="h2">Heading 2</option>
+    <option value="h3">Heading 3</option>
+  </select>
+
+  <button type="button" data-command="insertUnorderedList">• List</button>
+  <button type="button" data-command="insertOrderedList">1. List</button>
+  <button type="button" id="add-link-btn">Add Link</button>
+</div>
+
+<div id="content" class="rich-editor"
+     contenteditable="true"
+     data-placeholder="Write your blog article here..."
+     required></div>
 
         <label>SEO Title</label>
         <input id="seo-title" maxlength="65">

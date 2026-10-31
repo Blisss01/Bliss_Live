@@ -18,21 +18,42 @@
   </section>
 
   <main id="dashboard" hidden>
+
     <header class="admin-header">
       <h2>Bliss Blog Manager</h2>
       <button id="logout-btn" class="secondary">Logout</button>
     </header>
 
+    <!-- BLOG MANAGEMENT -->
     <section class="admin-content">
-      <h1>Create New Blog</h1>
+      <h1>Manage Blogs</h1>
+      <p>View and manage all your chocolate blog articles.</p>
+
+      <button type="button" id="refresh-blogs-btn">
+        Refresh Blogs
+      </button>
+
+      <div id="blogs-list">
+        <p>Login to load your blogs.</p>
+      </div>
+
+      <p id="manage-message"></p>
+    </section>
+
+    <!-- CREATE BLOG -->
+    <section class="admin-content">
+      <h1 id="form-heading">Create New Blog</h1>
       <p>Write, manage and publish your articles.</p>
 
       <form id="blog-form">
+
         <label>Blog Title</label>
-        <input id="title" required maxlength="120" placeholder="Enter blog title">
+        <input id="title" required maxlength="120"
+          placeholder="Enter blog title">
 
         <label>URL Slug</label>
-        <input id="slug" required placeholder="best-chocolate-gifts">
+        <input id="slug" required
+          placeholder="best-chocolate-gifts">
 
         <label>Category</label>
         <select id="category" required>
@@ -46,28 +67,38 @@
         </select>
 
         <label>Featured Image</label>
-        <input id="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+        <input id="image" type="file"
+          accept="image/jpeg,image/png,image/webp" required>
 
         <label>Short Description</label>
-        <textarea id="excerpt" rows="3" required maxlength="250"></textarea>
+        <textarea id="excerpt" rows="3"
+          required maxlength="250"></textarea>
 
         <label>Blog Content</label>
-        <textarea id="content" rows="14" required placeholder="Write your article here. Leave a blank line between paragraphs."></textarea>
+        <textarea id="content" rows="14" required
+          placeholder="Write your article here. Leave a blank line between paragraphs."></textarea>
 
         <label>SEO Title</label>
         <input id="seo-title" maxlength="65">
 
         <label>Meta Description</label>
-        <textarea id="meta-description" rows="3" maxlength="160"></textarea>
+        <textarea id="meta-description" rows="3"
+          maxlength="160"></textarea>
 
         <div class="actions">
-          <button type="button" id="draft-btn" class="secondary">Save Draft</button>
-          <button type="submit" id="publish-btn">Publish Blog</button>
+          <button type="button" id="draft-btn" class="secondary">
+            Save Draft
+          </button>
+
+          <button type="submit" id="publish-btn">
+            Publish Blog
+          </button>
         </div>
 
         <p id="status-message"></p>
       </form>
     </section>
+
   </main>
 
   <script src="admin.js"></script>

@@ -10,12 +10,14 @@ const form = document.getElementById("blog-form");
 const titleInput = document.getElementById("title");
 const slugInput = document.getElementById("slug");
 const imageInput = document.getElementById("image");
+const contentEditor = document.getElementById("content");
 
 let adminPassword = "";
 let editingSlug = null;
 let editingImage = "";
 let editingDate = "";
 
+// API REQUEST
 async function apiRequest(payload) {
   const response = await fetch(WORKER_URL, {
     method: "POST",
@@ -32,7 +34,7 @@ async function apiRequest(payload) {
   return result;
 }
 
-// Escape blog text before displaying it.
+// ESCAPE HTML
 function escapeHTML(value = "") {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -41,6 +43,75 @@ function escapeHTML(value = "") {
     '"': "&quot;",
     "'": "&#39;"
   })[char]);
+}
+
+// SANITIZE EDITOR HTML
+function sanitizeEditorHTML(html) {
+  const doc = new DOMParser().parseFromString(String(html || ""), "text/html");
+
+  const allowedTags = [
+    "P", "BR", "H2", "H3", "STRONG", "B",
+    "EM", "I", "U", "UL", "OL", "LI",
+    "A", "BLOCKQUOTE"
+  ];
+
+  function clean(node) {
+    [...node.childNodes].forEach(child => {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        if (!allowedTags.includes(child.tagName)) {
+          clean(child);
+          child.replaceWith(...child.childNodes);
+          return;
+        }
+
+        [...child.attributes].forEach(attr => {
+          if (child.tagName !== "A" || attr.name !== "href") {
+            child.removeAttribute(attr.name);
+          }
+        });
+
+        if (child.tagName === "A") {
+          try {
+            const url = new URL(child.getAttribute("href"));
+
+            if (!["http:", "https:"].includes(url.protocol)) {
+              child.removeAttribute("href");
+            } else {
+              child.setAttribute("href", url.href);
+              child.setAttribute("target", "_blank");
+              child.setAttribute("rel", "noopener noreferrer");
+            }
+          } catch {
+            child.removeAttribute("href");
+          }
+        }
+
+        clean(child);
+      } else if (child.nodeType !== Node.TEXT_NODE) {
+        child.remove();
+      }
+    });
+  }
+
+  clean(doc.body);
+  return doc.body.innerHTML;
+}
+
+// SUPPORT OLD PLAIN TEXT BLOGS
+function contentToEditorHTML(content = "") {
+  const value = String(content);
+
+  if (/<[a-z][\s\S]*>/i.test(value)) {
+    return sanitizeEditorHTML(value);
+  }
+
+  return value
+    .split(/\n\s*\n/)
+    .filter(paragraph => paragraph.trim())
+    .map(paragraph =>
+      `<p>${escapeHTML(paragraph.trim()).replace(/\n/g, "<br>")}</p>`
+    )
+    .join("");
 }
 
 // LOGIN
@@ -93,6 +164,52 @@ titleInput.addEventListener("input", () => {
     .replace(/^-|-$/g, "");
 });
 
+// RICH TEXT EDITOR
+const toolbar = document.querySelector(".editor-toolbar");
+
+toolbar.addEventListener("mousedown", event => {
+  if (event.target.closest("button")) {
+    event.preventDefault();
+  }
+});
+
+// BOLD, ITALIC, UNDERLINE, LISTS
+toolbar.querySelectorAll("[data-command]").forEach(button => {
+  button.addEventListener("click", () => {
+    contentEditor.focus();
+    document.execCommand(button.dataset.command, false, null);
+  });
+});
+
+// HEADINGS
+document.getElementById("format-block").addEventListener("change", event => {
+  contentEditor.focus();
+  document.execCommand("formatBlock", false, event.target.value);
+  event.target.value = "p";
+});
+
+// INSERT LINK
+document.getElementById("add-link-btn").addEventListener("click", () => {
+  const url = prompt("Enter link URL (https://...)");
+
+  if (!url) return;
+
+  try {
+    const parsed = new URL(url);
+
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      alert("Only HTTP and HTTPS links are allowed.");
+      return;
+    }
+
+    contentEditor.focus();
+    document.execCommand("createLink", false, parsed.href);
+
+  } catch {
+    alert("Please enter a valid URL.");
+  }
+});
+
 // LOAD ALL BLOGS
 async function loadBlogs() {
   const list = document.getElementById("blogs-list");
@@ -125,7 +242,6 @@ async function loadBlogs() {
       </div>
     `).join("");
 
-    // Attach edit and delete actions.
     list.querySelectorAll("[data-edit]").forEach(button => {
       button.addEventListener("click", () => {
         const blog = blogs.find(item => item.slug === button.dataset.edit);
@@ -162,7 +278,9 @@ function editBlog(blog) {
 
   document.getElementById("category").value = blog.category || "";
   document.getElementById("excerpt").value = blog.excerpt || "";
-  document.getElementById("content").value = blog.content || "";
+
+  contentEditor.innerHTML = contentToEditorHTML(blog.content || "");
+
   document.getElementById("seo-title").value = blog.seoTitle || "";
   document.getElementById("meta-description").value = blog.metaDescription || "";
 
@@ -183,6 +301,8 @@ function editBlog(blog) {
 // RESET FORM
 function resetForm() {
   form.reset();
+
+  contentEditor.innerHTML = "";
 
   editingSlug = null;
   editingImage = "";
@@ -212,6 +332,7 @@ async function deleteBlog(slug) {
     });
 
     message.textContent = "Blog deleted successfully!";
+
     if (editingSlug === slug) resetForm();
 
     await loadBlogs();
@@ -228,9 +349,12 @@ function getBlogData(status) {
     slug: slugInput.value.trim(),
     category: document.getElementById("category").value,
     excerpt: document.getElementById("excerpt").value.trim(),
-    content: document.getElementById("content").value.trim(),
+
+    content: sanitizeEditorHTML(contentEditor.innerHTML.trim()),
+
     seoTitle: document.getElementById("seo-title").value.trim(),
     metaDescription: document.getElementById("meta-description").value.trim(),
+
     status,
     publishedAt: editingDate || new Date().toISOString(),
     image: editingImage
@@ -244,6 +368,12 @@ async function publishBlog(status) {
   const draftButton = document.getElementById("draft-btn");
 
   if (!form.reportValidity()) return;
+
+  if (!contentEditor.innerText.trim()) {
+    message.textContent = "Please write your blog content.";
+    contentEditor.focus();
+    return;
+  }
 
   const file = imageInput.files[0];
 
@@ -269,7 +399,9 @@ async function publishBlog(status) {
 
   publishButton.disabled = true;
   draftButton.disabled = true;
-  message.textContent = status === "published" ? "Publishing..." : "Saving draft...";
+
+  message.textContent =
+    status === "published" ? "Publishing..." : "Saving draft...";
 
   try {
     let image = null;
@@ -277,8 +409,10 @@ async function publishBlog(status) {
     if (file) {
       const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
+
         reader.onload = () => resolve(reader.result.split(",")[1]);
         reader.onerror = () => reject(new Error("Could not read image."));
+
         reader.readAsDataURL(file);
       });
 
@@ -297,11 +431,13 @@ async function publishBlog(status) {
     });
 
     message.textContent = "Blog saved successfully!";
+
     resetForm();
     await loadBlogs();
 
   } catch (error) {
     message.textContent = "Error: " + error.message;
+
   } finally {
     publishButton.disabled = false;
     draftButton.disabled = false;

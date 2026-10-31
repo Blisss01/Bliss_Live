@@ -36,7 +36,16 @@ const PRODUCTS=[
 const $=s=>document.querySelector(s),inr=n=>"₹"+n.toLocaleString("en-IN");
 let cart=JSON.parse(localStorage.getItem("bliss")||"{}");
 const pg=location.pathname.split("/").pop()||"index.html";
-const nav=[["index.html","Home"],["shop.html","Shop"],["contact.html","Contact"],["privacy.html","Privacy"],["refund.html","Refunds"]];
+
+const nav=[
+  ["index.html","Home"],
+  ["shop.html","Shop"],
+  ["blog.html","Blog"],
+  ["contact.html","Contact"],
+  ["privacy.html","Privacy"],
+  ["refund.html","Refunds"]
+];
+
 document.body.insertAdjacentHTML("afterbegin",`<header><div class="wrap"><a class="logo" href="index.html"><img src="bliss_logo-optimized.jpg" alt="Bliss logo" width="42" height="42" fetchpriority="high" decoding="async">BLISS & Co.</a>
 <nav id="nav">${nav.map(n=>`<a href="${n[0]}" class="${pg==n[0]?"on":""}">${n[1]}</a>`).join("")}</nav>
 <button class="btn" id="cartBtn">Cart <b id="cnt">0</b></button><button class="btn menu" id="menu" aria-label="Menu">☰</button></div></header>

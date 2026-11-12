@@ -71,13 +71,9 @@ async function loadArticle() {
     image.src = blog.image || "";
     image.alt = blog.title || "Chocolate blog";
     image.loading = "eager";
-    image.style.cssText = `
-      width: 100%;
-      max-height: 500px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin: 20px 0;
-    `;
+
+image.style.cssText = "display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:12px;margin:20px 0;";
+
 
     image.onerror = () => {
       image.style.display = "none";

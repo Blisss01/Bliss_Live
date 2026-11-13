@@ -36,9 +36,10 @@ async function loadArticle() {
     image.alt = blog.title;
     image.style.cssText = "display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:12px;margin:20px 0;";
 
-    const content = document.createElement("div");
+    const content = document.createElement("div");  
     content.style.cssText = "max-width:800px;margin:30px auto;font-size:17px;line-height:1.9;";
 
+    // Content is stored as plain text with paragraphs separated by blank lines.
     blog.content.split(/\n\s*\n/).forEach(paragraph => {
       const p = document.createElement("p");
       p.textContent = paragraph;

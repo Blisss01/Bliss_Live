@@ -78,7 +78,7 @@ function renderBlogs() {
     const link = document.createElement("a");
     link.className = "read-more";
     link.textContent = "Read Article →";
-    link.href = `article.html?slug=${encodeURIComponent(blog.slug)}`;
+    link.href = `${encodeURIComponent(blog.slug)}.html`;
 
     content.append(category, title, excerpt, link);
     card.append(image, content);
@@ -90,15 +90,20 @@ async function loadBlogs() {
   try {
     const response = await fetch("blog-data.json");
 
-    if (!response.ok) throw new Error("Unable to load blogs");
+    if (!response.ok) {
+      throw new Error("Unable to load blogs");
+    }
 
     blogs = await response.json();
     blogs = blogs.filter(blog => blog.status === "published");
 
     renderCategories();
     renderBlogs();
+
   } catch (error) {
-    blogGrid.innerHTML = "<p>Unable to load articles. Please try again later.</p>";
+    blogGrid.innerHTML =
+      "<p>Unable to load articles. Please try again later.</p>";
+
     console.error(error);
   }
 }
